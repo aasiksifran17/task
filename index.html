@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Career Aid • Career Path Tracking</title>
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --brand:#2563eb; /* blue */
+      --brand-2:#0ea5e9; /* sky */
+      --ok:#16a34a; /* green */
+      --warn:#f59e0b; /* amber */
+      --danger:#ef4444; /* red */
+      --ring: 0 0 0 3px color-mix(in srgb, var(--brand), transparent 80%);
+      --radius:16px;
+      --shadow:0 10px 30px rgba(2,6,23,.08);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text); background:var(--bg);
+    }
+    /* Top bar */
+    .topbar{
+      position:sticky;top:0;z-index:50;
+      backdrop-filter:saturate(180%) blur(8px);
+      background:linear-gradient(90deg, #0b3d91, #1e40af);
+      color:#fff; box-shadow:var(--shadow);
+    }
+    .topbar .inner{max-width:1200px;margin:auto;display:flex;align-items:center;gap:16px;padding:14px 20px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.3px}
+    .brand svg{width:28px;height:28px}
+    .space{flex:1}
+    .crumbs{display:flex;gap:8px;align-items:center;font-size:14px;opacity:.95}
+    .crumbs a{color:#e2e8f0;text-decoration:none}
+    .crumbs .sep{opacity:.6}
+
+    /* Layout */
+    .wrap{max-width:1200px;margin:24px auto;padding:0 20px;}
+    .grid{display:grid;grid-template-columns:260px 1fr;gap:24px}
+    @media (max-width: 900px){.grid{grid-template-columns:1fr}}
+
+    /* Sidebar */
+    .sidebar{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+    .menu{list-style:none;margin:0;padding:4px}
+    .menu li{margin:4px 0}
+    .menu a{
+      display:flex;align-items:center;gap:10px;
+      padding:12px 12px;border-radius:12px;color:var(--text);
+      text-decoration:none;font-weight:600; font-size:15px;
+      border:1px solid #eef2f7;
+    }
+    .menu a:hover{background:#f1f5ff}
+    .menu a.active{background:linear-gradient(90deg, color-mix(in srgb, var(--brand) 12%, white), white); border-color:#dbeafe}
+
+    /* Main */
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .card .hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid #eef2f7}
+    .card .hdr h2{margin:0;font-size:20px}
+    .card .body{padding:18px 20px}
+
+    /* Quick header */
+    .hero{
+      position:relative; overflow:hidden; border-radius:var(--radius); color:#0b1324;
+      background: radial-gradient(1200px 400px at 20% -10%, #e0e7ff 0, #f2f6ff 45%, transparent 60%),
+                  linear-gradient(135deg, #ffffff, #eef4ff 70%);
+      border:1px solid #e5eaf5; box-shadow:var(--shadow);
+    }
+    .hero .inner{padding:28px 24px}
+    .hero h1{margin:0 0 6px 0;font-size:28px}
+    .hero p{margin:0;color:var(--muted)}
+    .hero .cta-row{margin-top:16px;display:flex;gap:12px;flex-wrap:wrap}
+    .btn{appearance:none;border:0;cursor:pointer;text-decoration:none;
+         display:inline-flex;align-items:center;gap:8px;font-weight:700;letter-spacing:.2px;
+         padding:12px 16px;border-radius:12px;box-shadow:var(--shadow)}
+    .btn.primary{background:linear-gradient(90deg, var(--brand), var(--brand-2));color:#fff}
+    .btn.secondary{background:#fff;border:1px solid #e5eaf5;color:var(--text)}
+    .btn:focus{outline:none;box-shadow:var(--ring)}
+
+    /* KPI cards */
+    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+    @media (max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:520px){.kpis{grid-template-columns:1fr}}
+    .kpi{padding:16px}
+    .kpi .title{font-size:13px;color:var(--muted)}
+    .kpi .val{font-size:28px;font-weight:800;margin-top:6px}
+    .progress{height:10px;border-radius:999px;background:#eef2f7;overflow:hidden;margin-top:10px}
+    .progress > span{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand-2))}
+
+    /* Two-column content */
+    .cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    @media (max-width:1000px){.cols{grid-template-columns:1fr}}
+
+    /* Timeline */
+    .timeline{position:relative;padding-left:26px}
+    .timeline:before{content:"";position:absolute;left:12px;top:4px;bottom:4px;width:2px;background:#e5eaf5}
+    .milestone{position:relative;padding:12px 12px 12px 0;margin-bottom:6px;border:1px solid #eef2f7;border-radius:12px}
+    .milestone .dot{position:absolute;left:-20px;top:14px;width:12px;height:12px;border-radius:999px;background:#c7d2fe;border:3px solid #fff;box-shadow:0 0 0 2px #dbeafe}
+    .milestone .top{display:flex;align-items:center;gap:10px}
+    .tag{font-size:12px;font-weight:700;padding:6px 10px;border-radius:999px;border:1px solid #e5eaf5;background:#fff}
+    .tag.ok{border-color:#dcfce7;color:#166534;background:#f0fdf4}
+    .tag.wip{border-color:#fff7ed;color:#92400e;background:#fffbeb}
+    .tag.todo{border-color:#e5e7eb;color:#374151;background:#f9fafb}
+
+    /* Checklist */
+    .checklist{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:720px){.checklist{grid-template-columns:1fr}}
+    .check{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #eef2f7;border-radius:12px;background:#fff}
+    .check input{width:18px;height:18px}
+
+    /* Footer note */
+    .note{font-size:13px;color:var(--muted)}
+
+    /* Utility chips */
+    .chips{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{padding:8px 10px;border-radius:999px;border:1px solid #e5eaf5;background:#fff;font-size:12px}
+
+    /* Home tile (if you want to embed this inside your grid of options) */
+    .career-aid-tile{display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid #e5eaf5;border-radius:16px;background:#fff;box-shadow:var(--shadow)}
+    .career-aid-tile h3{margin:0}
+    .tile-actions{display:flex;gap:10px;flex-wrap:wrap}
+  </style>
+</head>
+<body>
+  <!-- Sticky top bar / can be embedded under Career Aid page -->
+  <header class="topbar">
+    <div class="inner">
+      <div class="brand" title="Jaffna University">
+        <!-- simple crest icon -->
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2l7 4v5c0 5-3 9-7 11-4-2-7-6-7-11V6l7-4Z" fill="currentColor" opacity=".9"/></svg>
+        <span>Jaffna University • Career Aid</span>
+      </div>
+      <div class="space"></div>
+      <nav class="crumbs">
+        <a href="#">Home</a>
+        <span class="sep">›</span>
+        <a href="#">Career Aid</a>
+        <span class="sep">›</span>
+        <strong>Career Path Tracking</strong>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <!-- Optional: Drop this tile inside your main dashboard under the "Career Aid" option -->
+    <section class="career-aid-tile" style="margin-bottom:22px">
+      <h3>Career Aid – Quick Actions</h3>
+      <p class="note">Use these actions under the <strong>Career Aid</strong> option on your home page.</p>
+      <div class="tile-actions">
+        <a class="btn primary" href="#career-path">Open Career Path Tracking</a>
+        <a class="btn secondary" href="#cv">Resume Builder (coming soon)</a>
+      </div>
+    </section>
+
+    <div class="grid" id="career-path">
+      <!-- Sidebar menu -->
+      <aside class="sidebar">
+        <ul class="menu">
+          <li><a class="active" href="#career-path">Career Path Tracking</a></li>
+          <li><a href="#cv">Resume / CV Builder</a></li>
+          <li><a href="#jobs">Job Alerts</a></li>
+          <li><a href="#mentors">Mentorship</a></li>
+          <li><a href="#resources">Resources</a></li>
+        </ul>
+        <div style="margin-top:12px" class="chips">
+          <div class="chip">Goal: Front‑End Developer</div>
+          <div class="chip">Batch: 2020 A/L</div>
+          <div class="chip">Location: Jaffna</div>
+        </div>
+      </aside>
+
+      <!-- Main content -->
+      <main>
+        <section class="hero">
+          <div class="inner">
+            <h1>Career Path Tracking</h1>
+            <p>Track goals, skills, certifications, internships and job applications — all in one clean view.</p>
+            <div class="cta-row">
+              <a class="btn primary" href="#">Update Progress</a>
+              <a class="btn secondary" href="#">Export Report</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- KPIs -->
+        <div class="kpis" style="margin:18px 0">
+          <div class="card kpi">
+            <div class="title">Overall Progress</div>
+            <div class="val">68%</div>
+            <div class="progress"><span style="width:68%"></span></div>
+          </div>
+          <div class="card kpi">
+            <div class="title">Skills Completed</div>
+            <div class="val">7 / 10</div>
+            <div class="progress"><span style="width:70%"></span></div>
+          </div>
+          <div class="card kpi">
+            <div class="title">Certifications</div>
+            <div class="val">2 / 4</div>
+            <div class="progress"><span style="width:50%"></span></div>
+          </div>
+          <div class="card kpi">
+            <div class="title">Applications Sent</div>
+            <div class="val">12</div>
+            <div class="progress"><span style="width:80%"></span></div>
+          </div>
+        </div>
+
+        <div class="cols">
+          <!-- Timeline / Milestones -->
+          <div class="card">
+            <div class="hdr"><h2>Milestones Timeline</h2><span class="note">From foundation to first job</span></div>
+            <div class="body timeline">
+              <article class="milestone">
+                <span class="dot"></span>
+                <div class="top"><span class="tag ok">Done</span><strong>HTML & CSS Fundamentals</strong></div>
+                <p class="note">Build 3 static pages and a responsive layout.</p>
+              </article>
+              <article class="milestone">
+                <span class="dot"></span>
+                <div class="top"><span class="tag ok">Done</span><strong>JavaScript Basics</strong></div>
+                <p class="note">Variables, DOM, fetch, array methods.</p>
+              </article>
+              <article class="milestone">
+                <span class="dot"></span>
+                <div class="top"><span class="tag wip">In Progress</span><strong>React Essentials</strong></div>
+                <p class="note">Components, props, hooks, routing.</p>
+              </article>
+              <article class="milestone">
+                <span class="dot"></span>
+                <div class="top"><span class="tag todo">Planned</span><strong>Portfolio Website</strong></div>
+                <p class="note">Deploy to Vercel with 4 featured projects.</p>
+              </article>
+              <article class="milestone">
+                <span class="dot"></span>
+                <div class="top"><span class="tag todo">Planned</span><strong>Internship / Freelance</strong></div>
+                <p class="note">Minimum 3‑month internship or 2 client projects.</p>
+              </article>
+            </div>
+          </div>
+
+          <!-- Checklist / Skills -->
+          <div class="card">
+            <div class="hdr"><h2>Skills Checklist</h2><span class="note">Tick as you finish</span></div>
+            <div class="body">
+              <div class="checklist">
+                <label class="check"><input type="checkbox" checked> Semantic HTML / Accessibility</label>
+                <label class="check"><input type="checkbox" checked> Responsive CSS / Flex / Grid</label>
+                <label class="check"><input type="checkbox" checked> JS DOM & Events</label>
+                <label class="check"><input type="checkbox"> Async / fetch / APIs</label>
+                <label class="check"><input type="checkbox"> React Hooks (useState/useEffect)</label>
+                <label class="check"><input type="checkbox"> React Router</label>
+                <label class="check"><input type="checkbox"> Git & GitHub Workflow</label>
+                <label class="check"><input type="checkbox"> Basic Node & REST</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cols" style="margin-top:20px">
+          <!-- Certifications -->
+          <div class="card">
+            <div class="hdr"><h2>Certifications</h2><span class="note">Attach proof links</span></div>
+            <div class="body">
+              <ul class="menu" style="padding:0">
+                <li><a href="#">Responsive Web Design — FreeCodeCamp</a></li>
+                <li><a href="#">JavaScript Algorithms — FreeCodeCamp</a></li>
+                <li><a href="#">React Developer — (Planned)</a></li>
+                <li><a href="#">AWS Cloud Practitioner — (Planned)</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Applications / Targets -->
+          <div class="card">
+            <div class="hdr"><h2>Target Roles & Companies</h2><span class="note">Keep it focused</span></div>
+            <div class="body">
+              <div class="chips">
+                <div class="chip">Front‑End Developer</div>
+                <div class="chip">React Developer</div>
+                <div class="chip">Junior Web Engineer</div>
+                <div class="chip">Sublime Prints (Portfolio)</div>
+                <div class="chip">Local Startups</div>
+                <div class="chip">Remote Junior Roles</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="note" style="margin:18px 2px">Tip: This is pure HTML + CSS. Hook your backend later to persist progress. You can drop this page under your <strong>Career Aid</strong> option or link directly from the Career Aid tile above.</p>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
